@@ -66,69 +66,105 @@ class SearchProblem:
 
 
 
-def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
-    """Search the deepest nodes in the search tree first."""
-    frontier = util.Stack()
+def depthFirstSearch(problem):
+    """
+    Search the deepest nodes in the search tree first.
+    """
+    # 1. THE STARTING POINT
+    startState = problem.getStartState()
+    
+    # 2. THE TOOLS
+    fringe = util.Stack()
+    fringe.push((startState, []))
     visited = set()
-    frontier.push((problem.getStartState(), []))
 
-    while not frontier.isEmpty():
-        state, actions = frontier.pop()
+    # 3. THE EXPLORATION LOOP
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+
         if problem.isGoalState(state):
             return actions
-        if state in visited:
-            continue
-        visited.add(state)
-        for successor, action, _ in problem.getSuccessors(state):
-            if successor not in visited:
-                frontier.push((successor, actions + [action]))
+
+        if state not in visited:
+            visited.add(state)
+
+            for successor, action, stepCost in problem.getSuccessors(state):
+                if successor not in visited:
+                    newPath = actions + [action]
+                    fringe.push((successor, newPath))
 
     return []
 
-def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
+def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    frontier = util.Queue()
+    # 1. THE STARTING POINT
+    startState = problem.getStartState()
+    
+    # 2. THE TOOLS
+    # Notice the magic change: We use a Queue instead of a Stack!
+    fringe = util.Queue() 
+    fringe.push((startState, []))
+    
     visited = set()
 
-    start = problem.getStartState()
-    frontier.push((start, []))  # (state, actions so far)
-
-    while not frontier.isEmpty():
-        state, actions = frontier.pop()
+    # 3. THE EXPLORATION LOOP
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
 
         if problem.isGoalState(state):
             return actions
 
-        if state in visited:
-            continue
-        visited.add(state)
+        if state not in visited:
+            visited.add(state)
 
-        for successor, action, _ in problem.getSuccessors(state):
-            if successor not in visited:
-                frontier.push((successor, actions + [action]))
-
-    return []  # No solution found
-
-def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
-    """Search the node of least total cost first."""
-    frontier = util.PriorityQueue()
-    visited = set()
-    frontier.push((problem.getStartState(), []), 0)
-
-    while not frontier.isEmpty():
-        state, actions = frontier.pop()
-        if problem.isGoalState(state):
-            return actions
-        if state in visited:
-            continue
-        visited.add(state)
-        for successor, action, _ in problem.getSuccessors(state):
-            if successor not in visited:
-                new_actions = actions + [action]
-                frontier.push((successor, new_actions), problem.getCostOfActions(new_actions))
+            for successor, action, stepCost in problem.getSuccessors(state):
+                if successor not in visited:
+                    newPath = actions + [action]
+                    fringe.push((successor, newPath))
 
     return []
+def uniformCostSearch(problem):
+    """Search the node of least total cost first."""
+    # 1. THE STARTING POINT
+    startState = problem.getStartState()
+    
+    # 2. THE TOOLS
+    # The magic change: We use a Priority Queue!
+    fringe = util.PriorityQueue() 
+    
+    # We now need to track THREE things: the state, the path, AND the total cost.
+    # We push a tuple: (state, actions, cost)
+    # The second argument (0) is the "priority" (the cost). Lowest cost goes first!
+    fringe.push((startState, [], 0), 0) 
+    
+    visited = set()
 
+    # 3. THE EXPLORATION LOOP
+    while not fringe.isEmpty():
+        # Pop gives us the state, actions, and the total cost to get there
+        state, actions, cost = fringe.pop()
+
+        # Did we find the goal?
+        if problem.isGoalState(state):
+            return actions
+
+        # Have we been here before?
+        if state not in visited:
+            visited.add(state)
+
+            # Look at all the next steps
+            for successor, action, stepCost in problem.getSuccessors(state):
+                if successor not in visited:
+                    # Calculate the NEW total cost
+                    new_cost = cost + stepCost
+                    new_path = actions + [action]
+                    
+                    # Push to the Priority Queue. 
+                    # The item is (state, path, new_cost). 
+                    # The priority is new_cost (so the queue sorts by cost!)
+                    fringe.push((successor, new_path, new_cost), new_cost)
+
+    return []
 def nullHeuristic(state, problem=None) -> float:
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -136,29 +172,45 @@ def nullHeuristic(state, problem=None) -> float:
     """
     return 0
 
-def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
+def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    frontier = util.PriorityQueue()
+    # 1. THE STARTING POINT
+    startState = problem.getStartState()
+    
+    # 2. THE TOOLS
+    fringe = util.PriorityQueue() 
+    
+    # Calculate the starting priority: Cost (0) + Heuristic guess for the start state
+    start_priority = 0 + heuristic(startState, problem)
+    
+    # Push: (state, actions, cost). Priority is the combined score.
+    fringe.push((startState, [], 0), start_priority) 
+    
     visited = set()
-    start = problem.getStartState()
-    frontier.push((start, []), heuristic(start, problem))
 
-    while not frontier.isEmpty():
-        state, actions = frontier.pop()
+    # 3. THE EXPLORATION LOOP
+    while not fringe.isEmpty():
+        state, actions, cost = fringe.pop()
+
         if problem.isGoalState(state):
             return actions
-        if state in visited:
-            continue
-        visited.add(state)
-        for successor, action, _ in problem.getSuccessors(state):
-            if successor not in visited:
-                new_actions = actions + [action]
-                g = problem.getCostOfActions(new_actions)
-                h = heuristic(successor, problem)
-                frontier.push((successor, new_actions), g + h)
+
+        if state not in visited:
+            visited.add(state)
+
+            for successor, action, stepCost in problem.getSuccessors(state):
+                if successor not in visited:
+                    new_cost = cost + stepCost
+                    new_path = actions + [action]
+                    
+                    # THE MAGIC OF A*: Add the heuristic guess to the cost!
+                    h_n = heuristic(successor, problem)
+                    priority = new_cost + h_n
+                    
+                    # Push to the Priority Queue using the combined score
+                    fringe.push((successor, new_path, new_cost), priority)
 
     return []
-
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
