@@ -11,7 +11,7 @@ This project is based on the fundamentals of AI search algorithms like:
 ## 🚀 Objective
 Students must implement these algorithms in `search.py`, and test them using `searchAgents.py` within different maze layouts like `tinyMaze` or `mediumMaze`.
 
-## 🧱 Folder Structure
+##  Folder Structure
 - `search.py` — Where you implement your search algorithms.
 - `searchAgents.py` — Agents that use your algorithms.
 - `layouts/` — Mazes for Pacman to solve.
@@ -30,3 +30,31 @@ Students must implement these algorithms in `search.py`, and test them using `se
 Enjoy coding and good luck!
 
 — Professor Fajouri
+
+---
+
+## 🧪 Student Implementation & Testing
+
+**Student Name:** Akash Bandara  
+**Student ID:** [Insert Your Student ID Here]  
+
+**Successfully Implemented Algorithms:**
+- Depth-First Search (DFS)
+- Breadth-First Search (BFS)
+- Uniform Cost Search (UCS)
+- A* Search (A-Star)
+
+### How to Test the Algorithms:
+Open your terminal, navigate to the project directory, and run the following commands:
+
+**Depth-First Search (DFS):**
+`python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs`
+
+**Breadth-First Search (BFS):**
+`python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs`
+
+**Uniform Cost Search (UCS):**
+`python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs`
+
+**A* Search (A-Star):**
+`python pacman.py -l mediumMaze -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic`
