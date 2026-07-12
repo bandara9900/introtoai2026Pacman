@@ -36,7 +36,7 @@ Enjoy coding and good luck!
 ## 🧪 Student Implementation & Testing
 
 **Student Name:** Akash Bandara  
-**Student ID:** [Insert Your Student ID Here]  
+ 
 
 **Successfully Implemented Algorithms:**
 - Depth-First Search (DFS)
